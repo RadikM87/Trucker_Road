@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Trucker Quest: Парковка</title>
+    <!-- Подключение Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Стили для игры */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-area {
+            width: 400px;
+            height: 200px;
+            background: #fff;
+            border: 3px solid #333;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        #truck {
+            width: 80px;
+            height: 40px;
+            background: #8B4513;
+            position: absolute;
+            left: 0;
+            top: 80px;
+            transition: left 0.3s ease;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        #parking-spot {
+            width: 100px;
+            height: 40px;
+            background: #228B22;
+            position: absolute;
+            right: 20px;
+            top: 80px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Паркуй грузовик!</h2>
+    <div id="game-area">
+        <div id="truck">🚚</div>
+        <div id="parking-spot">🅿️</div>
+    </div>
+    <div class="controls">
+        <button onclick="moveLeft()">← Влево</button>
+        <button onclick="moveRight()">→ Вправо</button>
+        <button onclick="tryPark()">Парковаться</button>
+    </div>
+
+    <script>
+        let truckPosition = 0; // Начальная позиция грузовика
+        const truckSpeed = 20; // Пикселей за одно нажатие
+        const parkingZoneStart = 260; // Начало зоны парковки (в пикселях)
+
+        // Движение влево
+        function moveLeft() {
+            if (truckPosition > 0) {
+                truckPosition -= truckSpeed;
+                updateTruckPosition();
+            }
+        }
+
+        // Движение вправо
+        function moveRight() {
+            if (truckPosition < (400 - 80)) { // 400px (ширина области) - 80px (ширина грузовика)
+                truckPosition += truckSpeed;
+                updateTruckPosition();
+            }
+        }
+
+        // Обновление позиции грузовика
+        function updateTruckPosition() {
+            document.getElementById("truck").style.left = truckPosition + "px";
+        }
+
+        // Проверка парковки
+        function tryPark() {
+            const success = (truckPosition >= parkingZoneStart && truckPosition <= (parkingZoneStart + 20));
+
+            // Отправка результата в Telegram-бота
+            Telegram.WebApp.sendData(JSON.stringify({
+                action: "parking",
+                success: success,
+                score: success ? 100 : 0
+            }));
+        }
+    </script>
+</body>
+</html>
